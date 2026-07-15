@@ -1,5 +1,7 @@
 package com.bank.customer.controller;
 
+import com.bank.customer.dto.CustomerRequest;
+import com.bank.customer.dto.CustomerResponse;
 import com.bank.customer.entity.Customer;
 import com.bank.customer.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,27 +17,32 @@ public class CustomerController {
     private CustomerService customerService;
 
     // Create a customer
+//    @PostMapping
+//    public Customer createCustomer(@RequestBody Customer customer) {
+//        return customerService.saveCustomer(customer);
+//    }
+
     @PostMapping
-    public Customer createCustomer(@RequestBody Customer customer) {
-        return customerService.saveCustomer(customer);
+    public CustomerResponse createCustomer(@RequestBody CustomerRequest request) {
+        return customerService.saveCustomer(request);
     }
 
     // Get all customers
     @GetMapping
-    public List<Customer> getAllCustomers() {
+    public List<CustomerResponse> getAllCustomers() {
         return customerService.getAllCustomers();
     }
 
     @GetMapping("/{id}")
-    public Customer getCustomerById(@PathVariable Long id) {
+    public CustomerResponse getCustomerById(@PathVariable Long id) {
         return customerService.getCustomerById(id);
     }
 
     @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable Long id,
-                                   @RequestBody Customer customer) {
+    public CustomerResponse updateCustomer(@PathVariable Long id,
+                                   @RequestBody CustomerRequest  request ) {
 
-        return customerService.updateCustomer(id, customer);
+        return customerService.updateCustomer(id, request);
     }
 
     @DeleteMapping("/{id}")
