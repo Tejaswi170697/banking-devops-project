@@ -1,0 +1,66 @@
+### Create Customer 1
+POST http://localhost:8081/customers
+Content-Type: application/json
+
+{
+  "name": "Rahul",
+  "email": "rahul@gmail.com",
+  "phone": "9999999999"
+}
+
+###
+
+### Create Customer 2
+POST http://localhost:8081/customers
+Content-Type: application/json
+
+{
+  "name": "Tejaswi",
+  "email": "tejaswi@gmail.com",
+  "phone": "9876543210"
+}
+
+###
+
+### Create Customer 3
+POST http://localhost:8081/customers
+Content-Type: application/json
+
+{
+  "name": "Ramesh",
+  "email": "ramesh@gmail.com",
+  "phone": "8888888888"
+}
+
+###
+
+### Get All Customers
+GET http://localhost:8081/customers
+
+###
+
+### Get Customer By Id
+GET http://localhost:8081/customers/1
+
+###
+###
+
+### Update Customer
+PUT http://localhost:8081/customers/1
+Content-Type: application/json
+
+{
+  "name": "Rahul Sharma",
+  "email": "rahulsharma@gmail.com",
+  "phone": "8888888888"
+}
+
+###
+
+### Delete Customer
+DELETE http://localhost:8081/customers/1
+
+###
+
+### Get Customer That Doesn't Exist
+GET http://localhost:8081/customers/100
