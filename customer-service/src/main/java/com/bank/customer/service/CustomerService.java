@@ -17,9 +17,12 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class CustomerService {
 
-    @Autowired
-    private CustomerRepository customerRepository;
-
+   // @Autowired
+    //private CustomerRepository customerRepository;
+ private final CustomerRepository customerRepository;
+public CustomerService(CustomerRepository customerRepository){
+    this.customerRepository = customerRepository;
+}
 //    public List<Customer> getAllCustomers() {
 //        return customerRepository.findAll();
 //    }
