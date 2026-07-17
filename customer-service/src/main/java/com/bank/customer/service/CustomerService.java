@@ -7,6 +7,9 @@ import com.bank.customer.exception.CustomerNotFoundException;
 import com.bank.customer.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -129,5 +132,15 @@ public class CustomerService {
                 .email(customer.getEmail())
                 .phone(customer.getPhone())
                 .build();
+    }
+
+    public Page<CustomerResponse> getCustomers(int page, int size) {
+        logger.info("Fetching customers - page: {}, size: {}", page, size);
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Customer> customerPage = customerRepository.findAll(pageable);
+        logger.info("Customers fetched successfully. Total elements: {}",
+                customerPage.getTotalElements());
+        return customerPage.map(this::mapToResponse);
     }
 }
