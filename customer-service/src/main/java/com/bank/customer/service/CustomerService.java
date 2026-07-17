@@ -1,118 +1,133 @@
 package com.bank.customer.service;
 
-
 import com.bank.customer.dto.CustomerRequest;
 import com.bank.customer.dto.CustomerResponse;
 import com.bank.customer.entity.Customer;
 import com.bank.customer.exception.CustomerNotFoundException;
 import com.bank.customer.repository.CustomerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-
 @Service
 public class CustomerService {
 
-   // @Autowired
-    //private CustomerRepository customerRepository;
- private final CustomerRepository customerRepository;
-public CustomerService(CustomerRepository customerRepository){
-    this.customerRepository = customerRepository;
-}
-//    public List<Customer> getAllCustomers() {
-//        return customerRepository.findAll();
-//    }
-// Get All Customers
-   public List<CustomerResponse> getAllCustomers() {
+    private static final Logger logger =
+            LoggerFactory.getLogger(CustomerService.class);
+    private final CustomerRepository customerRepository;
 
-    List<Customer> customers = customerRepository.findAll();
+    public CustomerService(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
 
-    return customers.stream()
-            .map(customer -> new CustomerResponse(
-                    customer.getId(),
-                    customer.getName(),
-                    customer.getEmail(),
-                    customer.getPhone()))
-            .collect(Collectors.toList());
-}
+    // Get All Customers
+    public List<CustomerResponse> getAllCustomers() {
+        logger.info("Fetching all customers");
+        List<Customer> customers = customerRepository.findAll();
+        logger.info("Total customers found: {}", customers.size());
+        return customers.stream()
+                .map(this::mapToResponse)
 
-//    public Customer saveCustomer(Customer customer) {
-//        return customerRepository.save(customer);
-//    }
-// create customer
+//                .map(customer -> CustomerResponse.builder()
+//                        .id(customer.getId())
+//                        .name(customer.getName())
+//                        .email(customer.getEmail())
+//                        .phone(customer.getPhone())
+//                        .build())
+                .collect(Collectors.toList());
+    }
+
+    // Create Customer
     public CustomerResponse saveCustomer(CustomerRequest request) {
+        logger.info("Creating customer with email: {}", request.getEmail());
+        Customer customer = Customer.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .build();
 
-        // Convert Request DTO to Entity
-        Customer customer = new Customer();
-        customer.setName(request.getName());
-        customer.setEmail(request.getEmail());
-        customer.setPhone(request.getPhone());
-
-        // Save to database
         Customer savedCustomer = customerRepository.save(customer);
+        logger.info("Customer created successfully with id: {}", savedCustomer.getId());
+        return mapToResponse(savedCustomer);
 
-        return new CustomerResponse(
-                savedCustomer.getId(),
-                savedCustomer.getName(),
-                savedCustomer.getEmail(),
-                savedCustomer.getPhone());
-
-//        // Convert Entity to Response DTO
-//        CustomerResponse response = new CustomerResponse();
-//        response.setId(savedCustomer.getId());
-//        response.setName(savedCustomer.getName());
-//        response.setEmail(savedCustomer.getEmail());
-//        response.setPhone(savedCustomer.getPhone());
+//        return CustomerResponse.builder()
+//                .id(savedCustomer.getId())
+//                .name(savedCustomer.getName())
+//                .email(savedCustomer.getEmail())
+//                .phone(savedCustomer.getPhone())
 //
-//        return response;
+//                .build();
     }
 
-    //get customer by id
+    // Get Customer By Id
     public CustomerResponse getCustomerById(Long id) {
+        logger.info("Fetching customer with id: {}", id);
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() ->
-                        new CustomerNotFoundException("Customer not found"));
+                .orElseThrow(() -> {
+                    logger.error("Customer not found with id: {}", id);
+                    return new CustomerNotFoundException("Customer not found");
+                });
 
-        return new CustomerResponse(
-                customer.getId(),
-                customer.getName(),
-                customer.getEmail(),
-                customer.getPhone());
-//        return customerRepository.findById(id)
-//                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        logger.info("Customer found with id: {}", id);
+
+        return mapToResponse(customer);
+//        return CustomerResponse.builder()
+//                .id(customer.getId())
+//                .name(customer.getName())
+//                .email(customer.getEmail())
+//                .phone(customer.getPhone())
+//                .build();
     }
-//update customer
-    public CustomerResponse updateCustomer(Long id, CustomerRequest  request ) {
 
+    // Update Customer
+    public CustomerResponse updateCustomer(Long id, CustomerRequest request) {
+        logger.info("Updating customer with id: {}", id);
         Customer existingCustomer = customerRepository.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
-
-        existingCustomer.setName(request.getName());
-        existingCustomer.setEmail(request.getEmail());
-        existingCustomer.setPhone(request.getPhone());
+                .orElseThrow(() -> {
+                    logger.error("Customer not found with id: {}", id);
+                    return new CustomerNotFoundException("Customer not found");
+                });
 
         existingCustomer.setName(request.getName());
         existingCustomer.setEmail(request.getEmail());
         existingCustomer.setPhone(request.getPhone());
 
         Customer savedCustomer = customerRepository.save(existingCustomer);
-
-        return new CustomerResponse(
-                savedCustomer.getId(),
-                savedCustomer.getName(),
-                savedCustomer.getEmail(),
-                savedCustomer.getPhone());
+        logger.info("Customer updated successfully with id: {}", savedCustomer.getId());
+        return mapToResponse(savedCustomer);
+//        return CustomerResponse.builder()
+//                .id(savedCustomer.getId())
+//                .name(savedCustomer.getName())
+//                .email(savedCustomer.getEmail())
+//                .phone(savedCustomer.getPhone())
+//                .build();
     }
-//delete customer
+
+    // Delete Customer
     public void deleteCustomer(Long id) {
 
+        logger.info("Deleting customer with id: {}", id);
+
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+                .orElseThrow(() -> {
+                    logger.error("Customer not found with id: {}", id);
+                    return new CustomerNotFoundException("Customer not found");
+                });
 
         customerRepository.delete(customer);
+
+        logger.info("Customer deleted successfully with id: {}", id);
+    }
+    private CustomerResponse mapToResponse(Customer customer) {
+
+        return CustomerResponse.builder()
+                .id(customer.getId())
+                .name(customer.getName())
+                .email(customer.getEmail())
+                .phone(customer.getPhone())
+                .build();
     }
 }
