@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -134,13 +135,35 @@ public class CustomerService {
                 .build();
     }
 
-    public Page<CustomerResponse> getCustomers(int page, int size) {
-        logger.info("Fetching customers - page: {}, size: {}", page, size);
-        Pageable pageable = PageRequest.of(page, size);
+//    public Page<CustomerResponse> getCustomers(int page, int size) {
+//        logger.info("Fetching customers - page: {}, size: {}", page, size);
+//        Pageable pageable = PageRequest.of(page, size);
+//
+//        Page<Customer> customerPage = customerRepository.findAll(pageable);
+//        logger.info("Customers fetched successfully. Total elements: {}",
+//                customerPage.getTotalElements());
+//        return customerPage.map(this::mapToResponse);
+//    }
+
+    public Page<CustomerResponse> getCustomers(int page,
+                                               int size,
+                                               String sortBy,
+                                               String direction) {
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        logger.info("Fetching customers - page: {}, size: {}, sortBy: {}, direction: {}",
+                page, size, sortBy, direction);
 
         Page<Customer> customerPage = customerRepository.findAll(pageable);
+
         logger.info("Customers fetched successfully. Total elements: {}",
                 customerPage.getTotalElements());
+
         return customerPage.map(this::mapToResponse);
     }
 }

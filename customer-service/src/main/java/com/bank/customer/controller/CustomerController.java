@@ -7,6 +7,7 @@ import com.bank.customer.service.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -94,12 +95,24 @@ public class CustomerController {
         return ResponseEntity.noContent().build();
     }
 
+//paginatio
+//    @GetMapping("/page")
+//    public ResponseEntity<Page<CustomerResponse>> getCustomers(
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "5") int size, Sort sort) {
+//
+//        return ResponseEntity.ok(customerService.getCustomers(page, size));
+//    }
+    //pagination with sorting
+@GetMapping("/page")
+public ResponseEntity<Page<CustomerResponse>> getCustomers(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "5") int size,
+        @RequestParam(defaultValue = "id") String sortBy,
+        @RequestParam(defaultValue = "asc") String direction) {
 
-    @GetMapping("/page")
-    public ResponseEntity<Page<CustomerResponse>> getCustomers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-
-        return ResponseEntity.ok(customerService.getCustomers(page, size));
-    }
+    return ResponseEntity.ok(
+            customerService.getCustomers(page, size, sortBy, direction)
+    );
+}
 }
