@@ -1,7 +1,11 @@
 package com.bank.customer.service;
 
+import com.bank.customer.dto.AccountResponse;
+import com.bank.customer.dto.AddressResponse;
 import com.bank.customer.dto.CustomerRequest;
 import com.bank.customer.dto.CustomerResponse;
+import com.bank.customer.entity.Account;
+import com.bank.customer.entity.Address;
 import com.bank.customer.entity.Customer;
 import com.bank.customer.exception.CustomerNotFoundException;
 import com.bank.customer.repository.CustomerRepository;
@@ -13,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,12 +51,40 @@ public class CustomerService {
 
     // Create Customer
     public CustomerResponse saveCustomer(CustomerRequest request) {
+        Address address = Address.builder()
+                .city(request.getAddress().getCity())
+                .state(request.getAddress().getState())
+                .build();
         logger.info("Creating customer with email: {}", request.getEmail());
         Customer customer = Customer.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .phone(request.getPhone())
+                .address(address)
                 .build();
+
+        List<Account> accounts = new ArrayList<>();
+
+        if (request.getAccounts() != null) {
+
+            accounts = request.getAccounts()
+                    .stream()
+                    .map(accountRequest -> {
+
+                        Account account = Account.builder()
+                                .accountNumber(accountRequest.getAccountNumber())
+                                .balance(accountRequest.getBalance())
+                                .build();
+
+                        account.setCustomer(customer);
+
+                        return account;
+
+                    })
+                    .toList();
+        }
+
+        customer.setAccounts(accounts);
 
         Customer savedCustomer = customerRepository.save(customer);
         logger.info("Customer created successfully with id: {}", savedCustomer.getId());
@@ -127,11 +160,28 @@ public class CustomerService {
     }
     private CustomerResponse mapToResponse(Customer customer) {
 
+        List<AccountResponse> accountResponses = customer.getAccounts()
+                .stream()
+                .map(account -> AccountResponse.builder()
+                        .id(account.getId())
+                        .accountNumber(account.getAccountNumber())
+                        .balance(account.getBalance())
+                        .build())
+                .toList();
+
         return CustomerResponse.builder()
                 .id(customer.getId())
                 .name(customer.getName())
                 .email(customer.getEmail())
                 .phone(customer.getPhone())
+                .address(
+                        AddressResponse.builder()
+                                .id(customer.getAddress().getId())
+                                .city(customer.getAddress().getCity())
+                                .state(customer.getAddress().getState())
+                                .build()
+                )
+                .accounts(accountResponses)
                 .build();
     }
 

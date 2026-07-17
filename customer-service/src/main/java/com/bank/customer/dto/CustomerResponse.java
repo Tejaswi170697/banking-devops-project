@@ -2,6 +2,8 @@ package com.bank.customer.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,6 +15,9 @@ public class CustomerResponse {
     private String name;
     private String email;
     private String phone;
+
+    private AddressResponse address;
+    private List<AccountResponse> accounts;
 //constructor
 //    public CustomerResponse() {
 //    }

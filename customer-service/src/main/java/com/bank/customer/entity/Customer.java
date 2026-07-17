@@ -1,7 +1,10 @@
 package com.bank.customer.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,6 +26,15 @@ public class Customer {
     private String email;
 
     private String phone;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
+    @JsonManagedReference
+    private Address address;
+
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Account> accounts;
 //constructor
 //    public Customer() {
 //    }

@@ -10,12 +10,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class CustomerRequest {
+
+    private AddressRequest address;
+
    @NotBlank(message = "Name is required")
     private String name;
 
@@ -29,6 +34,7 @@ public class CustomerRequest {
            message = "Phone number must contain exactly 10 digits"
    )
     private String phone;
+    private List<AccountRequest> accounts;
 //constructor
 //    public CustomerRequest() {
 //    }
