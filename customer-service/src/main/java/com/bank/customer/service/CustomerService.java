@@ -166,4 +166,30 @@ public class CustomerService {
 
         return customerPage.map(this::mapToResponse);
     }
+    public List<CustomerResponse> searchCustomersByName(String name) {
+
+        logger.info("Searching customers with name containing: {}", name);
+
+        List<Customer> customers = customerRepository.findByNameContaining(name);
+
+        logger.info("Found {} customer(s)", customers.size());
+
+        return customers.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+    public CustomerResponse getCustomerByEmail(String email) {
+
+        logger.info("Searching customer by email: {}", email);
+
+        Customer customer = customerRepository.findCustomerByEmail(email)
+                .orElseThrow(() -> {
+                    logger.error("Customer not found with email: {}", email);
+                    return new CustomerNotFoundException("Customer not found with email: " + email);
+                });
+
+        logger.info("Customer found with email: {}", email);
+
+        return mapToResponse(customer);
+    }
 }

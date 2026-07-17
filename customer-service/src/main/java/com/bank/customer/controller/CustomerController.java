@@ -115,4 +115,17 @@ public ResponseEntity<Page<CustomerResponse>> getCustomers(
             customerService.getCustomers(page, size, sortBy, direction)
     );
 }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<CustomerResponse>> searchCustomersByName(
+            @RequestParam String name) {
+
+        return ResponseEntity.ok(customerService.searchCustomersByName(name));
+    }
+    @GetMapping("/email")
+    public ResponseEntity<CustomerResponse> getCustomerByEmail(
+            @RequestParam String email) {
+
+        return ResponseEntity.ok(customerService.getCustomerByEmail(email));
+    }
 }
